@@ -230,7 +230,10 @@ sunrealtype* SUNBandMatrix_Column(SUNMatrix A, sunindextype j)
  * -----------------------------------------------------------------
  */
 
-SUNMatrix_ID SUNMatGetID_Band(SUNMatrix A) { return SUNMATRIX_BAND; }
+SUNMatrix_ID SUNMatGetID_Band(SUNDIALS_MAYBE_UNUSED SUNMatrix A)
+{
+  return SUNMATRIX_BAND;
+}
 
 SUNMatrix SUNMatClone_Band(SUNMatrix A)
 {

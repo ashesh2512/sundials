@@ -497,7 +497,10 @@ sunindextype* SUNSparseMatrix_IndexPointers(SUNMatrix A)
  * -----------------------------------------------------------------
  */
 
-SUNMatrix_ID SUNMatGetID_Sparse(SUNMatrix A) { return SUNMATRIX_SPARSE; }
+SUNMatrix_ID SUNMatGetID_Sparse(SUNDIALS_MAYBE_UNUSED SUNMatrix A)
+{
+  return SUNMATRIX_SPARSE;
+}
 
 SUNMatrix SUNMatClone_Sparse(SUNMatrix A)
 {

@@ -74,6 +74,7 @@ struct _SUNHashMap
   **Returns:**
     * A SUNErrCode indicating success or a failure
  */
+SUNDIALS_MAYBE_UNUSED
 static SUNErrCode SUNHashMap_New(int max_size, SUNHashMap* map)
 {
   int i;
@@ -115,6 +116,7 @@ static SUNErrCode SUNHashMap_New(int max_size, SUNHashMap* map)
   **Returns:**
     * A SUNErrCode indicating success or a failure
  */
+SUNDIALS_MAYBE_UNUSED
 static SUNErrCode SUNHashMap_Destroy(SUNHashMap* map,
                                      void (*freevalue)(void* ptr))
 {
@@ -180,7 +182,8 @@ static int SUNHashMap_Iterate(SUNHashMap map, int start,
   return (map->max_size);
 }
 
-static int sunHashMapLinearProbeInsert(int idx, SUNHashMapKeyValue kv, void* ctx)
+static int sunHashMapLinearProbeInsert(int idx, SUNHashMapKeyValue kv,
+                                       SUNDIALS_MAYBE_UNUSED void* ctx)
 {
   /* find the next open spot */
   if (kv == NULL) { return (idx); /* open spot found at idx */ }
@@ -201,6 +204,7 @@ static int sunHashMapLinearProbeInsert(int idx, SUNHashMapKeyValue kv, void* ctx
     * ``-1`` -- an error occurred
     * ``-2`` -- the map is full
  */
+SUNDIALS_MAYBE_UNUSED
 static int SUNHashMap_Insert(SUNHashMap map, const char* key, void* value)
 {
   int idx;
@@ -264,6 +268,7 @@ static int sunHashMapLinearProbeGet(int idx, SUNHashMapKeyValue kv, void* key)
     * ``-1`` -- an error occurred
     * ``-2`` -- key not found
  */
+SUNDIALS_MAYBE_UNUSED
 static int SUNHashMap_GetValue(SUNHashMap map, const char* key, void** value)
 {
   int idx;
@@ -308,6 +313,7 @@ static int SUNHashMap_GetValue(SUNHashMap map, const char* key, void** value)
   **Returns:**
     * A SUNErrCode indicating success or a failure
  */
+SUNDIALS_MAYBE_UNUSED
 static SUNErrCode SUNHashMap_Sort(SUNHashMap map, SUNHashMapKeyValue** sorted,
                                   int (*compar)(const void*, const void*))
 {

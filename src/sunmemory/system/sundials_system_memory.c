@@ -70,7 +70,7 @@ SUNMemoryHelper SUNMemoryHelper_Sys(SUNContext sunctx)
 
 SUNErrCode SUNMemoryHelper_Alloc_Sys(SUNMemoryHelper helper, SUNMemory* memptr,
                                      size_t mem_size, SUNMemoryType mem_type,
-                                     void* queue)
+                                     SUNDIALS_MAYBE_UNUSED void* queue)
 {
   SUNFunctionBegin(helper->sunctx);
 
@@ -100,7 +100,7 @@ SUNErrCode SUNMemoryHelper_Alloc_Sys(SUNMemoryHelper helper, SUNMemory* memptr,
 }
 
 SUNErrCode SUNMemoryHelper_Dealloc_Sys(SUNMemoryHelper helper, SUNMemory mem,
-                                       void* queue)
+                                       SUNDIALS_MAYBE_UNUSED void* queue)
 {
   SUNFunctionBegin(helper->sunctx);
 
@@ -125,7 +125,7 @@ SUNErrCode SUNMemoryHelper_Dealloc_Sys(SUNMemoryHelper helper, SUNMemory mem,
 
 SUNErrCode SUNMemoryHelper_Copy_Sys(SUNMemoryHelper helper, SUNMemory dst,
                                     SUNMemory src, size_t memory_size,
-                                    void* queue)
+                                    SUNDIALS_MAYBE_UNUSED void* queue)
 {
   SUNFunctionBegin(helper->sunctx);
   SUNAssert(src->type == SUNMEMTYPE_HOST, SUN_ERR_ARG_INCOMPATIBLE);
