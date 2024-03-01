@@ -28,6 +28,10 @@ set(unit_tests
   "cv_test_kpr.cpp\;--dgmax_lsetup 0.0"
   "cv_test_kpr.cpp\;--dgmax_jbad 1.0"
   "cv_test_getjac.cpp\;"
+  "cv_test_resize_history.cpp\;"
+  "test_nordsieck.cpp\;"
+  "cv_test_poly.cpp\;"
+  "cv_test_trig.cpp\;"
 )
 
 # Add the build and install targets for each test

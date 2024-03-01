@@ -27,6 +27,7 @@ set(cvode_SOURCES
   cvode_ls.c
   cvode_nls.c
   cvode_proj.c
+  cvode_resize.c
   )
 
 # Add variable cvode_HEADERS with the exported CVODE header files
