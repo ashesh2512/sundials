@@ -470,6 +470,8 @@ typedef struct CVodeMemRec
   N_Vector resize_wrk[L_MAX];
   sunbooleantype first_step_after_resize;
 
+  int cv_err_weight_method;
+
 }* CVodeMem;
 
 /*
