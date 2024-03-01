@@ -188,9 +188,7 @@ int SUNNonlinSolSolve_FixedPoint(SUNNonlinearSolver NLS, N_Vector y0,
 
 #if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
   SUNLogger_QueueMsg(NLS->sunctx->logger, SUN_LOGLEVEL_INFO,
-                     "SUNNonlinSolSolve_FixedPoint", "begin-iteration",
-                     "iter = %ld, nni = %ld", (long int)0,
-                     FP_CONTENT(NLS)->niters);
+                     "SUNNonlinSolSolve_FixedPoint", "begin-nonlinear-solve", "");
 #endif
 
   /* Looping point for attempts at solution of the nonlinear system:
@@ -236,20 +234,32 @@ int SUNNonlinSolSolve_FixedPoint(SUNNonlinearSolver NLS, N_Vector y0,
                                     FP_CONTENT(NLS)->ctest_data);
 
 #if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
-    SUNLogger_QueueMsg(NLS->sunctx->logger, SUN_LOGLEVEL_INFO,
-                       "SUNNonlinSolSolve_FixedPoint", "end-of-iterate",
-                       "iter = %ld, nni = %ld, wrmsnorm = %.16g",
-                       (long int)FP_CONTENT(NLS)->curiter,
-                       FP_CONTENT(NLS)->niters, N_VWrmsNorm(delta, w));
+    /*     SUNLogger_QueueMsg(NLS->sunctx->logger, SUN_LOGLEVEL_INFO, */
+    /*                        "SUNNonlinSolSolve_FixedPoint", "convergence-check", */
+    /*                        "iter = %ld, wrmsnorm = %.16g", FP_CONTENT(NLS)->curiter + 1, */
+    /*                        N_VWrmsNorm(delta, w)); /\* ideally don't recompute norm, add Get function to API *\/ */
 #endif
 
     /* return if successful */
-    if (retval == 0) { return SUN_SUCCESS; }
+    if (retval == SUN_SUCCESS)
+    {
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+      SUNLogger_QueueMsg(NLS->sunctx->logger, SUN_LOGLEVEL_INFO,
+                         "SUNNonlinSolSolve_FixedPoint", "end-nonlinear-solve",
+                         "success, iters = %ld", FP_CONTENT(NLS)->curiter + 1);
+#endif
+      return (SUN_SUCCESS);
+    }
 
     /* check if the iterations should continue; otherwise increment the
        convergence failure count and return error flag */
     if (retval != SUN_NLS_CONTINUE)
     {
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+      SUNLogger_QueueMsg(NLS->sunctx->logger, SUN_LOGLEVEL_INFO,
+                         "SUNNonlinSolSolve_FixedPoint", "end-nonlinear-solve",
+                         "Failed, iters = %ld", FP_CONTENT(NLS)->curiter + 1);
+#endif
       FP_CONTENT(NLS)->nconvfails++;
       return (retval);
     }
@@ -257,6 +267,12 @@ int SUNNonlinSolSolve_FixedPoint(SUNNonlinearSolver NLS, N_Vector y0,
 
   /* if we've reached this point, then we exhausted the iteration limit;
      increment the convergence failure count and return */
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+  SUNLogger_QueueMsg(NLS->sunctx->logger, SUN_LOGLEVEL_INFO,
+                     "SUNNonlinSolSolve_FixedPoint", "end-nonlinear-solve",
+                     "Failed, iters = %ld", FP_CONTENT(NLS)->curiter + 1);
+#endif
+
   FP_CONTENT(NLS)->nconvfails++;
   return SUN_NLS_CONV_RECVR;
 }

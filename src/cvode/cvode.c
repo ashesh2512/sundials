@@ -2381,6 +2381,37 @@ static int cvStep(CVodeMem cv_mem)
   int eflag;                   /* error test return flag                   */
   sunbooleantype doProjection; /* flag to apply projection in this step    */
 
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "Start cvStep\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "tn             = %g\n",
+          cv_mem->cv_tn);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "current h      = %g\n",
+          cv_mem->cv_h);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "h prime        = %g\n",
+          cv_mem->cv_hprime);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "next h (?)     = %g\n",
+          cv_mem->cv_next_h);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "h scale        = %g\n",
+          cv_mem->cv_hscale);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "eta            = %g\n",
+          cv_mem->cv_eta);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "current order  = %d\n",
+          cv_mem->cv_q);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "next order     = %d\n",
+          cv_mem->cv_qprime);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "next order (?) = %d\n",
+          cv_mem->cv_next_q);
+  for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+  {
+    /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+    /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+    N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+  }
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
+
   /* Initialize local counters for convergence and error test failures */
 
   ncf = npf = nef = 0;
@@ -2390,6 +2421,19 @@ static int cvStep(CVodeMem cv_mem)
   {
     cvAdjustParams(cv_mem);
   }
+
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "After AdjustParams\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+  for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+  {
+    /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+    /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+    N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+  }
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
 
   /* Check if this step should be projected */
   doProjection = SUNFALSE;
@@ -2408,19 +2452,68 @@ static int cvStep(CVodeMem cv_mem)
 
   for (;;)
   {
-#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_DEBUG
-    SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_DEBUG, "CVODE::cvStep",
-                       "enter-step-attempt-loop",
-                       "step = %li, h = %.16g, q = %d, t_n = %.16g",
-                       cv_mem->cv_nst, cv_mem->cv_next_h, cv_mem->cv_next_q,
-                       cv_mem->cv_tn);
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+    SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_INFO, "CVODE::cvStep",
+                       "begin-step-attempt",
+                       "step = %li, t_n = %.16g, h = %.16g, q = %d",
+                       cv_mem->cv_nst + 1, cv_mem->cv_tn, cv_mem->cv_h,
+                       cv_mem->cv_q);
 #endif
 
     cvPredict(cv_mem);
+
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "After Predict\n");
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+    for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+    {
+      /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+      /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+      fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+      N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+    }
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
+
     cvSet(cv_mem);
 
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "After Set\n");
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+    for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+    {
+      /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+      /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+      fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+      N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+    }
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
+
     nflag = cvNls(cv_mem, nflag);
+
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "After NLS\n");
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+    for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+    {
+      /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+      /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+      fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+      N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+    }
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
+
     kflag = cvHandleNFlag(cv_mem, &nflag, saved_t, &ncf);
+
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+    if (kflag == PREDICT_AGAIN || kflag != DO_ERROR_TEST)
+    {
+      SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_INFO, "CVODE::cvStep",
+                         "end-step-attempt", "failed solve, kflag = %i", kflag);
+    }
+#endif
 
     /* Go back in loop if we need to predict again (nflag=PREV_CONV_FAIL) */
     if (kflag == PREDICT_AGAIN) { continue; }
@@ -2436,6 +2529,15 @@ static int cvStep(CVodeMem cv_mem)
       /* Perform projection (nflag=CV_SUCCESS) */
       pflag = cvDoProjection(cv_mem, &nflag, saved_t, &npf);
 
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+      if (pflag != CV_SUCCESS)
+      {
+        SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_INFO, "CVODE::cvStep",
+                           "end-step-attempt", "failed projection, pflag = %i",
+                           pflag);
+      }
+#endif
+
       /* Go back in loop if we need to predict again (nflag=PREV_PROJ_FAIL) */
       if (pflag == PREDICT_AGAIN) { continue; }
 
@@ -2445,6 +2547,16 @@ static int cvStep(CVodeMem cv_mem)
 
     /* Perform error test (nflag=CV_SUCCESS) */
     eflag = cvDoErrorTest(cv_mem, &nflag, saved_t, &nef, &dsm);
+
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+    if (eflag != CV_SUCCESS)
+    {
+      SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_INFO, "CVODE::cvStep",
+                         "end-step-attempt",
+                         "failed error-test, dsm = %.16g, eflag = %i", dsm,
+                         eflag);
+    }
+#endif
 
     /* Go back in loop if we need to predict again (nflag=PREV_ERR_FAIL) */
     if (eflag == TRY_AGAIN) { continue; }
@@ -2456,12 +2568,43 @@ static int cvStep(CVodeMem cv_mem)
     break;
   }
 
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+  SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_INFO, "CVODE::cvStep",
+                     "end-step-attempt", "success, dsm = %.16g", dsm);
+#endif
+
   /* Nonlinear system solve and error test were both successful.
      Update data, and consider change of step and/or order.       */
 
   cvCompleteStep(cv_mem);
 
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "After Complete Step\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+  for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+  {
+    /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+    /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+    N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+  }
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
+
   cvPrepareNextStep(cv_mem, dsm);
+
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "After PrepareNextStep\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+  for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+  {
+    /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+    /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+    N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+  }
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
 
   /* If Stablilty Limit Detection is turned on, call stability limit
      detection routine for possible order reduction. */
@@ -2476,6 +2619,37 @@ static int cvStep(CVodeMem cv_mem)
       estimated local error vector. */
 
   N_VScale(cv_mem->cv_tq[2], cv_mem->cv_acor, cv_mem->cv_acor);
+
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "End cvStep\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "tn             = %g\n",
+          cv_mem->cv_tn);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "current h      = %g\n",
+          cv_mem->cv_h);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "h prime        = %g\n",
+          cv_mem->cv_hprime);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "next h (?)     = %g\n",
+          cv_mem->cv_next_h);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "h scale        = %g\n",
+          cv_mem->cv_hscale);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "eta            = %g\n",
+          cv_mem->cv_eta);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "current order  = %d\n",
+          cv_mem->cv_q);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "next order     = %d\n",
+          cv_mem->cv_qprime);
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "next order (?) = %d\n",
+          cv_mem->cv_next_q);
+  for (int ord = 0; ord <= cv_mem->cv_qmax; ord++)
+  {
+    /* sunrealtype* vdata = N_VGetArrayPointer(cv_mem->cv_zn[ord]); */
+    /* fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = %23.16e\n", ord, vdata[0]); */
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[%d] = \n", ord);
+    N_VPrintFile(cv_mem->cv_zn[ord], cv_mem->cv_sunctx->logger->debug_fp);
+  }
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "-----\n");
+#endif
 
   return (CV_SUCCESS);
 }
@@ -3396,8 +3570,15 @@ static int cvDoErrorTest(CVodeMem cv_mem, int* nflagPtr, sunrealtype saved_t,
 
 #if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_DEBUG
   SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_DEBUG, "CVODE::cvDoErrorTest",
-                     "error-test", "step = %li, h = %.16g, dsm = %.16g",
-                     cv_mem->cv_nst, cv_mem->cv_h, dsm);
+                     "error-test", "dsm = %.16g", dsm);
+#endif
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+  fprintf(cv_mem->cv_sunctx->logger->debug_fp, "ewt\n");
+  if (cv_mem->cv_err_weight_method)
+  {
+    N_VPrintFile(cv_mem->cv_vtemp3, cv_mem->cv_sunctx->logger->debug_fp);
+  }
+  else { N_VPrintFile(cv_mem->cv_ewt, cv_mem->cv_sunctx->logger->debug_fp); }
 #endif
 
   /* If est. local error norm dsm passes test, return CV_SUCCESS */
@@ -3560,8 +3741,8 @@ static void cvCompleteStep(CVodeMem cv_mem)
 
 #if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_DEBUG
   SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_DEBUG, "CVODE::cvCompleteStep",
-                     "return", "nst = %d, nscon = %d", cv_mem->cv_nst,
-                     cv_mem->cv_nscon);
+                     "return", "nst = %d, qwait = %d, nscon = %d",
+                     cv_mem->cv_nst, cv_mem->cv_qwait, cv_mem->cv_nscon);
 #endif
 }
 
@@ -3612,7 +3793,7 @@ static void cvPrepareNextStep(CVodeMem cv_mem, sunrealtype dsm)
 #if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_DEBUG
   SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_DEBUG, "CVODE::cvPrepareNextStep",
                      "return",
-                     "eta = %.16g, hprime = %.16g, qprime = %d, qwait = %d\n",
+                     "eta = %.16g, hprime = %.16g, qprime = %d, qwait = %d",
                      cv_mem->cv_eta, cv_mem->cv_hprime, cv_mem->cv_qprime,
                      cv_mem->cv_qwait);
 #endif
@@ -3700,6 +3881,22 @@ static sunrealtype cvComputeEtaqp1(CVodeMem cv_mem)
     dup = N_VWrmsNorm(cv_mem->cv_tempv, cv_mem->cv_ewt) * cv_mem->cv_tq[3];
     cv_mem->cv_etaqp1 =
       ONE / (SUNRpowerR(BIAS3 * dup, ONE / (cv_mem->cv_L + 1)) + ADDON);
+
+#ifdef SUNDIALS_LOGGING_EXTRA_DEBUG
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "zn[qmax]\n");
+    N_VPrintFile(cv_mem->cv_zn[cv_mem->cv_qmax],
+                 cv_mem->cv_sunctx->logger->debug_fp);
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "acor\n");
+    N_VPrintFile(cv_mem->cv_acor, cv_mem->cv_sunctx->logger->debug_fp);
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "tempv\n");
+    N_VPrintFile(cv_mem->cv_tempv, cv_mem->cv_sunctx->logger->debug_fp);
+    fprintf(cv_mem->cv_sunctx->logger->debug_fp, "ewt\n");
+    N_VPrintFile(cv_mem->cv_ewt, cv_mem->cv_sunctx->logger->debug_fp);
+#endif
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_DEBUG
+    SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_DEBUG, "CVODE::cvChooseEta",
+                       "select-order", "cquot = %.16g, dup = %.16g", cquot, dup);
+#endif
   }
   return (cv_mem->cv_etaqp1);
 }
@@ -3719,6 +3916,13 @@ static sunrealtype cvComputeEtaqp1(CVodeMem cv_mem)
 static void cvChooseEta(CVodeMem cv_mem)
 {
   sunrealtype etam;
+
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_DEBUG
+  SUNLogger_QueueMsg(CV_LOGGER, SUN_LOGLEVEL_DEBUG, "CVODE::cvChooseEta",
+                     "select-order",
+                     "eta_q = %.16g, eta_q-1 = %.16g, eta_q+1 = %.16g",
+                     cv_mem->cv_etaq, cv_mem->cv_etaqm1, cv_mem->cv_etaqp1);
+#endif
 
   etam = SUNMAX(cv_mem->cv_etaqm1, SUNMAX(cv_mem->cv_etaq, cv_mem->cv_etaqp1));
 
